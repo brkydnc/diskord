@@ -1,6 +1,9 @@
 use serde::Deserialize;
 use serde_aux::field_attributes::deserialize_number_from_string;
 
+mod connection;
+pub use connection::Connection;
+
 // TODO: Use enums to represent some of the fields (e.g flags, premium_type)
 
 #[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq)]
