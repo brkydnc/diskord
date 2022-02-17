@@ -23,8 +23,9 @@ impl Client {
     fn request(&self, method: Method, path: &str) -> ResponseFuture {
         let request = Request::builder()
             .method(method)
-            .header("Authorization", format!("Bot {}", self.token))
             .uri(format!("https://discord.com/api/v9{}", path))
+            .header("Authorization", format!("Bot {}", self.token))
+            .header("User-Agent", r#"DiscordBot ("", "0.1.0")"#)
             .body(Body::empty())
             .expect("Error building request");
 
