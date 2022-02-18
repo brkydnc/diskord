@@ -20,10 +20,10 @@ impl Client {
         }
     }
 
-    fn request(&self, method: Method, path: &str) -> ResponseFuture {
+    fn request(&self, method: Method, path: impl AsRef<str>) -> ResponseFuture {
         let request = Request::builder()
             .method(method)
-            .uri(format!("https://discord.com/api/v9{}", path))
+            .uri(format!("https://discord.com/api/v9{}", path.as_ref()))
             .header("Authorization", format!("Bot {}", self.token))
             .header("User-Agent", r#"DiscordBot ("", "0.1.0")"#)
             .body(Body::empty())
@@ -33,7 +33,7 @@ impl Client {
     }
 
     pub fn get_user(&self, id: &str) -> ResponseFuture {
-        self.request(Method::GET, &format!("/users/{}", id))
+        self.request(Method::GET, format!("/users/{}", id))
     }
 
     pub fn get_guild_member(&self, guild_id: &str, user_id: &str) -> ResponseFuture {
