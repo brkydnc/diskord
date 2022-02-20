@@ -5,17 +5,17 @@ use hyper::{
 use hyper_tls::HttpsConnector;
 
 pub struct Client {
-    http: HyperClient<HttpsConnector<HttpConnector>>,
+    client: HyperClient<HttpsConnector<HttpConnector>>,
     token: String,
 }
 
 impl Client {
     pub fn new(token: &str) -> Self {
         let https = HttpsConnector::new();
-        let hyper_client = HyperClient::builder().build::<_, Body>(https);
+        let client = HyperClient::builder().build::<_, Body>(https);
 
         Self {
-            http: hyper_client,
+            client,
             token: token.to_string(),
         }
     }
@@ -29,17 +29,6 @@ impl Client {
             .body(Body::empty())
             .expect("Error building request");
 
-        self.http.request(request)
-    }
-
-    pub fn get_user(&self, id: &str) -> ResponseFuture {
-        self.request(Method::GET, format!("/users/{}", id))
-    }
-
-    pub fn get_guild_member(&self, guild_id: &str, user_id: &str) -> ResponseFuture {
-        self.request(
-            Method::GET,
-            &format!("/guilds/{}/members/{}", guild_id, user_id),
-        )
+        self.client.request(request)
     }
 }

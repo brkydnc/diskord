@@ -1,6 +1,5 @@
-pub mod client;
 pub mod error;
+pub mod http;
 pub mod model;
 
-pub use client::Client;
 pub use error::Error;
