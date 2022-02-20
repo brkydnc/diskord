@@ -1,30 +1,31 @@
 use hyper::Error as HyperError;
 use std::error::Error as StdError;
 use std::fmt::{Debug, Display, Formatter, Result as FormatResult};
+use std::result::Result as StdResult;
 
-pub type Result<T> = std::result::Result<T, Error>;
+pub type Result<T> = StdResult<T, Error>;
 
 type Cause = Box<dyn StdError + Send + Sync>;
 
 pub struct Error {
-    inner: Box<ErrorImpl>,
+    inner: Box<InnerError>,
 }
 
-struct ErrorImpl {
+struct InnerError {
     kind: Kind,
     cause: Option<Cause>,
 }
 
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
-pub(super) enum Kind {
+pub enum Kind {
     Hyper,
 }
 
 impl Error {
     pub(super) fn new(kind: Kind) -> Self {
         Self {
-            inner: Box::new(ErrorImpl { kind, cause: None }),
+            inner: InnerError { kind, cause: None }.into(),
         }
     }
 
@@ -37,6 +38,14 @@ impl Error {
         match self.inner.kind {
             Kind::Hyper => "hyper error",
         }
+    }
+
+    pub fn kind(&self) -> Kind {
+        self.inner.kind
+    }
+
+    pub fn is_hyper(&self) -> bool {
+        matches!(self.inner.kind, Kind::Hyper)
     }
 }
 
