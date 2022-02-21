@@ -1,3 +1,4 @@
+use std::fmt::{Display, Error, Formatter};
 use std::num::NonZeroU64;
 
 #[derive(Copy, Clone, Debug)]
@@ -17,5 +18,11 @@ impl TryFrom<u64> for Snowflake {
 impl From<Snowflake> for u64 {
     fn from(snowflake: Snowflake) -> u64 {
         snowflake.id.get()
+    }
+}
+
+impl Display for Snowflake {
+    fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
+        f.write_str(&self.id.to_string())
     }
 }
