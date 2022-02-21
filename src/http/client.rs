@@ -1,3 +1,4 @@
+use crate::http::route::Route;
 use hyper::{
     client::{HttpConnector, ResponseFuture},
     Body, Client as HyperClient, Method, Request,
@@ -20,10 +21,10 @@ impl Client {
         }
     }
 
-    fn request(&self, method: Method, path: impl AsRef<str>) -> ResponseFuture {
+    fn request(&self, method: Method, route: Route) -> ResponseFuture {
         let request = Request::builder()
             .method(method)
-            .uri(format!("https://discord.com/api/v9{}", path.as_ref()))
+            .uri(format!("https://discord.com/api/v9{}", route.to_path()))
             .header("Authorization", format!("Bot {}", self.token))
             .header("User-Agent", r#"DiscordBot ("", "0.1.0")"#)
             .body(Body::empty())
