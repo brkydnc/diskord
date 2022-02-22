@@ -1,4 +1,4 @@
-use crate::http::request::Request;
+use super::request::Request;
 use hyper::{
     client::{HttpConnector, ResponseFuture},
     Body, Client as HyperClient,

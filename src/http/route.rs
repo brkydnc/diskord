@@ -1,4 +1,4 @@
-use crate::http::Request;
+use super::request::Request;
 use crate::snowflake::Snowflake;
 use hyper::Method;
 use serde_json::json;
