@@ -24,15 +24,19 @@ impl Request {
     pub fn to_hyper_request(self, token: &str) -> HyperRequest<Body> {
         let Self { route, body, .. } = self;
         let (method, path) = route.method_and_path();
-        let body = body.map_or(Body::empty(), Body::from);
 
-        HyperRequest::builder()
+        let mut builder = HyperRequest::builder();
+
+        if body.is_some() {
+            builder = builder.header(CONTENT_TYPE, "application/json");
+        }
+
+        builder
             .method(method)
             .uri(format!("https://discord.com/api/v9{}", path))
             .header(AUTHORIZATION, format!("Bot {}", token))
             .header(USER_AGENT, r#"DiscordBot ("", "0.1.0")"#)
-            .header(CONTENT_TYPE, "application/json")
-            .body(body)
+            .body(body.map_or(Body::empty(), Body::from))
             .expect("Error building hyper request")
     }
 }
