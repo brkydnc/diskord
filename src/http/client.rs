@@ -1,7 +1,7 @@
 use crate::http::route::Route;
 use hyper::{
     client::{HttpConnector, ResponseFuture},
-    Body, Client as HyperClient, Method, Request,
+    Body, Client as HyperClient, Request,
 };
 use hyper_tls::HttpsConnector;
 
