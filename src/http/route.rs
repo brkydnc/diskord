@@ -1,8 +1,10 @@
+use crate::http::Request;
 use crate::snowflake::Snowflake;
-use std::num::NonZeroU8;
 use hyper::Method;
+use serde_json::json;
+use std::num::NonZeroU8;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 #[non_exhaustive]
 pub enum Route {
     GetCurrentUser,
@@ -39,6 +41,7 @@ pub enum Route {
 impl Route {
     pub fn method_and_path(&self) -> (Method, String) {
         use Route::*;
+
         match self {
             GetCurrentUser => (Method::GET, "/users/@me".into()),
             GetUser { user_id } => (Method::GET, format!("/users/{}", user_id)),
@@ -63,10 +66,28 @@ impl Route {
 
                 (Method::GET, path)
             }
-            GetCurrentUserGuildMember { guild_id } => (Method::GET, format!("/users/@me/guilds/{}/member", guild_id)),
-            LeaveGuild { guild_id } =>(Method::DELETE, format!("/users/@me/guilds/{}", guild_id)),
+            GetCurrentUserGuildMember { guild_id } => (
+                Method::GET,
+                format!("/users/@me/guilds/{}/member", guild_id),
+            ),
+            LeaveGuild { guild_id } => (Method::DELETE, format!("/users/@me/guilds/{}", guild_id)),
             CreateDM { .. } => (Method::POST, "/users/@me/channels".into()),
             GetUserConnections => (Method::GET, "/users/@me/connections".into()),
+        }
+    }
+}
+
+impl From<Route> for Request {
+    fn from(route: Route) -> Request {
+        use Route::*;
+
+        match route {
+            route @ CreateDM { recipient_id } => {
+                let value = json!({ "recipient_id": recipient_id });
+                let body = serde_json::to_vec(&value).unwrap();
+                Request::new(route).with_body(body)
+            }
+            route => Request::new(route),
         }
     }
 }
