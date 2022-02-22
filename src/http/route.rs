@@ -1,5 +1,6 @@
 use crate::snowflake::Snowflake;
 use std::num::NonZeroU8;
+use hyper::Method;
 
 #[derive(Debug)]
 #[non_exhaustive]
@@ -36,11 +37,11 @@ pub enum Route {
 }
 
 impl Route {
-    pub fn to_path(&self) -> String {
+    pub fn method_and_path(&self) -> (Method, String) {
         use Route::*;
         match self {
-            GetCurrentUser => "/users/@me".into(),
-            GetUser { user_id } => format!("/users/{}", user_id),
+            GetCurrentUser => (Method::GET, "/users/@me".into()),
+            GetUser { user_id } => (Method::GET, format!("/users/{}", user_id)),
             GetCurrentUserGuilds {
                 before,
                 after,
@@ -60,14 +61,12 @@ impl Route {
                     path.push_str(&format!("&limit={}", limit));
                 }
 
-                path
+                (Method::GET, path)
             }
-            GetCurrentUserGuildMember { guild_id } => {
-                format!("/users/@me/guilds/{}/member", guild_id)
-            }
-            LeaveGuild { guild_id } => format!("/users/@me/guilds/{}", guild_id),
-            CreateDM { .. } => "/users/@me/channels".into(),
-            GetUserConnections => "/users/@me/connections".into(),
+            GetCurrentUserGuildMember { guild_id } => (Method::GET, format!("/users/@me/guilds/{}/member", guild_id)),
+            LeaveGuild { guild_id } =>(Method::DELETE, format!("/users/@me/guilds/{}", guild_id)),
+            CreateDM { .. } => (Method::POST, "/users/@me/channels".into()),
+            GetUserConnections => (Method::GET, "/users/@me/connections".into()),
         }
     }
 }
