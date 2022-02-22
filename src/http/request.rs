@@ -7,15 +7,24 @@ use hyper::{
 #[derive(Debug)]
 #[non_exhaustive]
 pub struct Request {
-    route: Route,
-    body: Option<Vec<u8>>,
+    pub(super) route: Route,
+    pub(super) body: Option<Vec<u8>>,
 }
 
 impl Request {
+    pub fn new(route: Route) -> Self {
+        Self { route, body: None }
+    }
+
+    pub fn with_body(mut self, body: Vec<u8>) -> Self {
+        self.body = Some(body);
+        self
+    }
+
     pub fn to_hyper_request(self, token: &str) -> HyperRequest<Body> {
         let Self { route, body, .. } = self;
         let (method, path) = route.method_and_path();
-        let body = body.map_or(Body::empty(), |body| Body::from(body));
+        let body = body.map_or(Body::empty(), Body::from);
 
         HyperRequest::builder()
             .method(method)
