@@ -1,8 +1,6 @@
-use super::request::Request;
-use hyper::{
-    client::{HttpConnector, ResponseFuture},
-    Body, Client as HyperClient,
-};
+use super::{error::ApiError, request::Request};
+use crate::error::Result;
+use hyper::{body::Body, client::HttpConnector, Client as HyperClient, Response as HyperResponse};
 use hyper_tls::HttpsConnector;
 
 pub struct Client {
@@ -21,7 +19,16 @@ impl Client {
         }
     }
 
-    fn request(&self, request: Request) -> ResponseFuture {
-        self.client.request(request.to_hyper_request(&self.token))
+    async fn request(&self, request: Request) -> Result<HyperResponse<Body>> {
+        let response = self
+            .client
+            .request(request.to_hyper_request(&self.token))
+            .await?;
+
+        if response.status().is_success() {
+            Ok(response)
+        } else {
+            Err(ApiError::try_from_response(response).await?.into())
+        }
     }
 }
