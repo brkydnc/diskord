@@ -1,7 +1,8 @@
+use serde::Serialize;
 use std::fmt::{Display, Error, Formatter};
 use std::num::NonZeroU64;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Serialize)]
 pub struct Snowflake {
     id: NonZeroU64,
 }
