@@ -2,7 +2,6 @@ use super::request::Request;
 use crate::snowflake::Snowflake;
 use hyper::Method;
 use serde_json::json;
-use std::num::NonZeroU8;
 
 #[derive(Debug, Clone, Copy)]
 #[non_exhaustive]
@@ -24,7 +23,7 @@ pub enum Route {
     GetCurrentUserGuilds {
         before: Option<Snowflake>,
         after: Option<Snowflake>,
-        limit: Option<NonZeroU8>,
+        limit: Option<u8>,
     },
     GetCurrentUserGuildMember {
         guild_id: Snowflake,
