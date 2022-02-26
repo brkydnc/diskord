@@ -7,7 +7,7 @@ use std::fmt::{Display, Formatter, Result as FormatResult};
 
 #[derive(Debug, Deserialize)]
 #[non_exhaustive]
-pub struct DiscordError {
+struct DiscordError {
     message: String,
     code: u64,
 }
