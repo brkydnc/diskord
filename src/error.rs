@@ -1,6 +1,7 @@
 use crate::http::ApiError;
+use crate::snowflake::Error as SnowflakeError;
 use hyper::Error as HyperError;
-use serde_json::Error as SerdeJson;
+use serde_json::Error as SerdeJsonError;
 use std::error::Error as StdError;
 use std::fmt::{Debug, Display, Formatter, Result as FormatResult};
 use std::result::Result as StdResult;
@@ -24,6 +25,7 @@ pub enum Kind {
     Hyper,
     Api,
     SerdeJson,
+    Snowflake,
 }
 
 impl Error {
@@ -43,6 +45,7 @@ impl Error {
             Kind::Hyper => "hyper error",
             Kind::Api => "discord api error",
             Kind::SerdeJson => "serde_json error",
+            Kind::Snowflake => "snowflake error",
         }
     }
 
@@ -56,6 +59,14 @@ impl Error {
 
     pub fn is_api(&self) -> bool {
         matches!(self.inner.kind, Kind::Api)
+    }
+
+    pub fn is_serde_json(&self) -> bool {
+        matches!(self.inner.kind, Kind::SerdeJson)
+    }
+
+    pub fn is_snowflake(&self) -> bool {
+        matches!(self.inner.kind, Kind::Snowflake)
     }
 }
 
@@ -103,8 +114,14 @@ impl From<ApiError> for Error {
     }
 }
 
-impl From<SerdeJson> for Error {
-    fn from(cause: SerdeJson) -> Error {
+impl From<SerdeJsonError> for Error {
+    fn from(cause: SerdeJsonError) -> Error {
         Error::new(Kind::SerdeJson).with(cause)
+    }
+}
+
+impl From<SnowflakeError> for Error {
+    fn from(cause: SnowflakeError) -> Error {
+        Error::new(Kind::Snowflake).with(cause)
     }
 }
