@@ -11,9 +11,7 @@ use std::str::FromStr;
 pub use error::Error;
 
 #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
-pub struct Snowflake {
-    id: NonZeroU64,
-}
+pub struct Snowflake(NonZeroU64);
 
 struct SnowflakeVisitor;
 
@@ -31,7 +29,7 @@ impl<'de> Visitor<'de> for SnowflakeVisitor {
         let id = NonZeroU64::from_str(s)
             .map_err(|_| de::Error::invalid_value(Unexpected::Str(s), &self))?;
 
-        Ok(Snowflake { id })
+        Ok(Snowflake(id))
     }
 }
 
@@ -40,7 +38,7 @@ impl Serialize for Snowflake {
     where
         S: Serializer,
     {
-        self.id.to_string().serialize(serializer)
+        self.0.to_string().serialize(serializer)
     }
 }
 
@@ -58,18 +56,18 @@ impl TryFrom<u64> for Snowflake {
 
     fn try_from(value: u64) -> Result<Self, Self::Error> {
         let id: NonZeroU64 = value.try_into().map_err(|_| Error)?;
-        Ok(Self { id })
+        Ok(Self(id))
     }
 }
 
 impl From<Snowflake> for u64 {
     fn from(snowflake: Snowflake) -> u64 {
-        snowflake.id.get()
+        snowflake.0.get()
     }
 }
 
 impl Display for Snowflake {
     fn fmt(&self, f: &mut Formatter) -> FormatResult {
-        f.write_str(&self.id.to_string())
+        f.write_str(&self.0.to_string())
     }
 }
