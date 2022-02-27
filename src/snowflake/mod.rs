@@ -10,7 +10,7 @@ use std::str::FromStr;
 
 pub use error::Error;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
 pub struct Snowflake {
     id: NonZeroU64,
 }
