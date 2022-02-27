@@ -1,3 +1,4 @@
+use crate::snowflake::Snowflake;
 use serde::Deserialize;
 use serde_aux::field_attributes::deserialize_number_from_string;
 
@@ -8,8 +9,7 @@ pub use connection::Connection;
 
 #[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq)]
 pub struct User {
-    #[serde(deserialize_with = "deserialize_number_from_string")]
-    pub id: u64,
+    pub id: Snowflake,
     pub username: String,
     #[serde(deserialize_with = "deserialize_number_from_string")]
     pub discriminator: u16,
